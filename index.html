@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <title>Fractal Generator</title>
+    <style>
+
+
+    .bd-subnavbar {
+      position: relative;
+      z-index: 1020;
+      background-color: rgba(255,255,255,0.75);
+      -webkit-backdrop-filter: blur(1rem);
+      backdrop-filter: blur(1rem);
+      border-bottom: 1px solid rgba(0,0,0,0.15);
+      box-shadow: 0rem -0.6rem 1rem 1rem rgba(0, 0, 0, 0.075);
+    }
+    .font-bold {
+      font-weight: 600;
+    }
+    .bd-sidebar {
+      z-index: 1010;
+      background-color:var(--bs-gray-100);
+      box-shadow: 0 0 1rem 0 rgba(0, 0,0, 0.25);
+      height: calc(100% - 7rem);
+      position: fixed;
+      min-width: 256px;
+      max-width: 320px;
+      width: 16%;
+      overflow-y: auto;
+    }
+    .content-outline {
+      border: 1px solid var(--bs-gray-400);
+      border-radius: 0.25rem;
+    }
+    main {
+      z-index: 1000;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      padding: auto;
+    }
+    #main_screen {
+      width: 100%;
+      height: 100%;
+      cursor: move;
+      position: absolute;
+      padding: auto;
+      text-align: center;
+    }
+    .textbox_panel {
+      max-height: 150px;
+      overflow-y: scroll;
+    }
+    #fractal_renderer {
+      position: relative;
+      top: -450%;
+      left: -450%;
+      border: 3px solid #d3d3d3;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="bd-subnavbar p-2" aria-label="navigation">
+    <ul class="nav nav-pills" id="nav-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="main-tab-button" data-bs-toggle="pill" data-bs-target="#main-tab" type="button" role="tab" aria-controls="main-tab" aria-selected="true">Главная</button>
+      </li>
+      <li class="nav-item me-auto" role="presentation">
+        <button class="nav-link" id="about-tab-button" data-bs-toggle="pill" data-bs-target="#about-tab" type="button" role="tab" aria-controls="about-tab" aria-selected="false">О сайте</button>
+      </li>
+      <h3 class="font-bold">Генератор Фракталов</h3>
+    </ul>
+    </div>
+    <div class="tab-content">
+      <!-- Main -->
+      <div class="tab-pane fade show active" id="main-tab"
+      role="tabpanel" aria-labelledby="main-tab-button">
+        <div class="bd-sidebar p-2" style="border-right: 1px solid rgba(0,0,0,0.15);">
+          <div class="content-outline p-2">
+            <label for="cmds" class="form-label">Команды</label>
+            <div id="cmds" class="content-outline list-group textbox_panel">
+            </div>
+            <div style="display: flex;">
+              <button id="add_cmd" class="btn btn-success btn-sm mt-1" style="margin-top: 3px;" type="button">Добавить</button>
+              <button id="del_cmd" class="btn btn-danger btn-sm mt-1 ms-1" style="margin-top: 3px; margin-left: 3px;" type="button">Удалить</button>
+              <button id="hlp_cmd" class="btn btn-primary btn-sm mt-1 ms-1" style="margin-top: 3px; margin-left: 3px;" type="button">?</button>
+            </div>
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label for="rules" class="form-label">Правила</label>
+            <div id="rules" class="content-outline list-group textbox_panel">
+            </div>
+            <div style="display: flex;">
+              <button id="add_rule" class="btn btn-success btn-sm mt-1" type="button">Добавить</button>
+              <button id="del_rule" class="btn btn-danger btn-sm mt-1 ms-1" type="button">Удалить</button>
+              <button id="hlp_rule" class="btn btn-primary btn-sm mt-1 ms-1" type="button">?</button>
+            </div>
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label for="axiom" class="form-label">Аксиома</label>
+            <input id="axiom" type="text" class="form-control">
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label class="form-label">Цвет фрактала</label>
+            <div class="input-group">
+              <input id="fractal_color" class="form-control form-control-color" type="color" title="Выберите Цвет фрактала">
+              <input id="fractal_color_res" class="form-control" type="text" value="#ffaa66" readonly>
+            </div>
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label class="form-label">Цвет заднего фона</label>
+            <div class="input-group">
+              <input id="bg_color" class="form-control form-control-color" type="color" title="Выберите Цвет фона">
+              <input id="bg_color_res" class="form-control" type="text" value="#ffffff" readonly>
+            </div>
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label for="angle" class="form-label">Угол</label>
+            <input id="angle" type="number" class="form-control">
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label for="lineWidth" class="form-label">Ширина линий</label>
+            <input id="lineWidth" type="number" class="form-control">
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label for="lineLength" class="form-label">Длина линий</label>
+            <input id="lineLength" type="number" class="form-control">
+          </div>
+          <div class="content-outline p-2 mt-2">
+            <label for="iters" class="form-label">Количество итераций</label>
+            <input id="iters" type="number" class="form-control">
+          </div>
+        </div>
+        <div class="bd-sidebar p-2" id="presets" style="right: 0; border-left: 1px solid rgba(0,0,0,0.15);">
+          <label class="form-label">Примеры</label>
+          <div class="bd-example">
+            <div class="card">
+              <img class="card-img-top" src="/assets/fractal_1.png" role="img" focusable="false">
+              <div class="card-body">
+                <h5 class="card-title">Треугольник Серпинского</h5>
+                <button id="fractal_1" class="btn btn-primary" type="button">Загрузить
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="bd-example mt-2">
+            <div class="card">
+              <img class="card-img-top" src="/assets/fractal_2.png" role="img" focusable="false">
+              <div class="card-body">
+                <h5 class="card-title">Снежинка Коха</h5>
+                <button id="fractal_2" class="btn btn-primary" type="button">Загрузить
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="bd-example mt-2">
+            <div class="card">
+              <img class="card-img-top" src="/assets/fractal_3.png" role="img" focusable="false">
+              <div class="card-body">
+                <h5 class="card-title">Кривая Дракона</h5>
+                <button id="fractal_3" class="btn btn-primary" type="button">Загрузить
+                </button>
+              </div>
+            </div>
+          </div>
+          <!--<div class="bd-example mt-2">
+            <div class="card">
+              <img class="card-img-top" src="/assets/fractal_1.png" role="img" focusable="false">
+              <div class="card-body">
+                <h5 class="card-title">Снежинка Коха</h5>
+                <button id="fractal_4" class="btn btn-primary" type="button">Загрузить
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="bd-example mt-2">
+            <div class="card">
+              <img class="card-img-top" src="/assets/fractal_1.png" role="img" focusable="false">
+              <div class="card-body">
+                <h5 class="card-title">Снежинка Коха</h5>
+                <button id="fractal_5" class="btn btn-primary" type="button">Загрузить
+                </button>
+              </div>
+            </div>
+          </div>-->
+          <!--<nav class="collapse bd-links" id="bd-docs-nav" aria-label="Docs navigation">-->
+        </div>
+        <main>
+          <div id="main_screen" height="100%" width="100%">
+            <svg id="fractal_renderer" style="stroke:rgb(255,0,0);stroke-width:2;" height="1000%" width="1000%">
+              <line x1="0" y1="0" x2="0" y2="0" />
+            </svg>
+          </div>
+        </main>
+        <div class="fixed-bottom navbar-light p-2" style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(1rem); border-top: 1px solid rgba(0,0,0,0.15);">
+        <ul class="nav nav-pills" role="tablist">
+          <li class="nav-item me-auto">
+            <button id="btn_generate" class="btn btn-primary" type="button">
+              <span id="btn_generate_spinner" style="display: none;" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span id="btn_generate_text_1" style="display: none;">Генерация...</span>
+              <span id="btn_generate_text_2" style="display: inline;">Сгенерировать</span>
+            </button>
+            <!--<input class="btn btn-primary" type="button" value="Сгенерировать">-->
+            <!--<button class="nav-link active" id="main-tab-button" data-bs-toggle="pill" data-bs-target="#main-tab" type="button" role="tab" aria-controls="main-tab" aria-selected="true">Главная</button> style="margin-top: auto;"-->
+          </li>
+          <li class="nav-item ms-auto" role="presentation">
+            <!--<button class="btn btn-primary" id="show-presets-tab-button" data-bs-toggle="pill" data-bs-target="#presets-tab" type="button" role="tab" aria-controls="presets-tab" aria-selected="false">Показаать примеры</button>-->
+          </li>
+          <!--<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalErrorCmd">Launch modal</button>-->
+        </ul>
+        </div>
+
+        <!-- Modal: modalCart  tabindex="-1" role="dialog"-->
+        <div class="modal fade" id="modalErrorCmd" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <!--Header-->
+              <div class="modal-header py-2">
+                <h4 class="modal-title">Ошибка команды</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <!--Body-->
+              <div class="modal-body py-2">
+                
+                <!--<label class="modal-title">Цвет заднего фона</label>-->
+                <h5 class="modal-title" id="modalErrorCmdContent">Ошибка</h5>
+                <!--<table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Product name</th>
+                      <th>Price</th>
+                      <th>Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>Product 1</td>
+                      <td>100$</td>
+                      <td><a><i class="fas fa-times"></i></a></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">2</th>
+                      <td>Product 2</td>
+                      <td>100$</td>
+                      <td><a><i class="fas fa-times"></i></a></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">3</th>
+                      <td>Product 3</td>
+                      <td>100$</td>
+                      <td><a><i class="fas fa-times"></i></a></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">4</th>
+                      <td>Product 4</td>
+                      <td>100$</td>
+                      <td><a><i class="fas fa-times"></i></a></td>
+                    </tr>
+                    <tr class="total">
+                      <th scope="row">5</th>
+                      <td>Total</td>
+                      <td>400$</td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>-->
+        
+              </div>
+              <!--Footer-->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Зыкрыть</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ок</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Doc -->
+      <div class="tab-pane fade" id="about-tab" role="tabpanel" aria-labelledby="about-tab-button">
+        <div class="bd-sidebar p-2" style="border-right: 1px solid rgba(0,0,0,0.15);">
+          about
+          <!--<nav class="collapse bd-links" id="bd-docs-nav" aria-label="Docs navigation">-->
+        </div>
+      </div>
+    </div>
+  <script type="text/javascript" src="config.js"></script>
+  <script type="text/javascript" src="scripts/plotter_svg.js"></script>
+  <script type="text/javascript" src="scripts/main.js"></script>
+  </body>
+</html>
